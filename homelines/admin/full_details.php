@@ -1,0 +1,166 @@
+
+<html>
+
+<body>
+   
+<!-- Full Details -->
+    <div class="modal fade" id="detail<?php echo $sqrow['salesid']; ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					
+					<center><h4 class="modal-title" id="myModalLabel">Homeline Enterprises Receipt</h4></center>
+                </div>
+             
+
+                <div class="modal-body">
+				<?php
+					$sales = mysqli_query($conn,"SELECT * FROM admin_side where salesid='".$sqrow['salesid']."'");
+					$srow  = mysqli_fetch_array($sales);
+				?>
+				<div id="printThisToo<?php echo $sqrow['salesid']; ?>">
+				<table width="100%" cellpadding="5" >
+					<tr>
+						<td width="65%">
+						
+							To,<br />
+							<b>RECEIVER (BILL TO)</b><br>
+							Name :	<strong><?php echo ucwords($srow['name']); ?></strong><br>	
+							Billing Address : <strong><?php echo ucwords($srow['address']); ?></strong><br>
+							Email : <strong><?php echo ucwords($srow['email']); ?></strong><br>
+							Contact : <strong><?php echo ucwords($srow['contact']); ?></strong><br>
+						</td>
+						
+						<td width="35%">
+						
+							Invoice No. : <strong><?php echo ucwords($srow['salesid']); ?></strong><br />
+							Invoice Date :<?php echo date("F d, Y", strtotime($srow['sales_date'])); ?></
+							strong><br />
+						    Payment Method :	<strong><?php echo ucwords($srow['payment']); ?></strong><br>	
+							
+						</td>
+					</tr>
+				</table>
+					
+					<div style="height:10px;"></div>
+					<div class="row">
+						<div class="col-lg-12">
+							<table width="100%" class="table table-striped table-bordered table-hover">
+								<thead>
+									<tr>
+										<th>Product Name</th>
+										<th>Price</th>
+										<th>Purchase Qty</th>
+										<th>SubTotal</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php
+										$total=0;
+										$pd=mysqli_query($conn,"select * from sales_detail left join product on product.productid=sales_detail.productid where salesid='".$sqrow['salesid']."'");
+										while($pdrow=mysqli_fetch_array($pd)){
+											?>
+											<tr>
+												<td><?php echo ucwords($pdrow['product_name']); ?></td>
+												<td align="right"><?php echo number_format($pdrow['product_price'],2); ?></td>
+												<td><?php echo $pdrow['sales_qty']; ?></td>
+												<td align="right">
+													<?php 
+														$subtotal=$pdrow['product_price']*$pdrow['sales_qty'];
+														echo number_format($subtotal,2);
+														$total+=$subtotal;
+													?>
+												</td>
+											</tr>
+											<?php
+										}
+									?>
+									<tr>
+										<td align="right" colspan="3"><strong>Total</strong></td>
+										<td align="right"><strong><?php echo number_format($total,2); ?></strong></td>
+									</tr>
+								</tbody>
+							</table>
+							
+						</div>
+					</div>      
+				</div>
+				</div>
+				
+			</div>
+
+                <div class="modal-footer">
+				<style type="text/css">
+@media screen {
+  #printSection {
+      display: none;
+  }
+}
+@media print {
+  #printPageButton {
+    display: none;
+  }
+}
+@media print {
+  #printPageButton2 {
+    display: none;
+  }
+}
+
+@media print {
+  body * {
+    visibility:hidden;
+  }
+  #printSection, #printSection * {
+    visibility:visible;
+  }
+  #printSection {
+    position:absolute;
+    left:0;
+    top:0;
+  }
+}
+</style>
+<button id="btnPrint<?php echo $sqrow['salesid']; ?>" style="width: 90px; height: 35px;">Print</button>
+<script type="text/javascript">
+  document.getElementById("btnPrint<?php echo $sqrow['salesid']; ?>").onclick = function() {
+    // printElement(document.getElementById("printThis"));
+    
+    printElement(document.getElementById("printThisToo<?php echo $sqrow['salesid']; ?>"), true, "<hr />");
+    window.print();
+}
+
+function printElement(elem, append, delimiter) {
+    var domClone = elem.cloneNode(true);
+    var $printSection = document.getElementById("printSection");
+    if (!$printSection) {
+        var $printSection = document.createElement("div");
+        $printSection.id = "printSection";
+        document.body.appendChild($printSection);
+    }
+    if (append !== true) {
+        $printSection.innerHTML = "";
+    }
+    else if (append === true) {
+        if (typeof(delimiter) === "string") {
+            $printSection.innerHTML += delimiter;
+        }
+        else if (typeof(delimiter) === "object") {
+            $printSection.appendChlid(delimiter);
+        }
+    }
+    $printSection.appendChild(domClone);
+}
+</script>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"> <i class="fa fa-times"></i> Close</button>
+
+							 </div>
+				   </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
